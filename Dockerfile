@@ -22,7 +22,8 @@ COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certifica
 COPY --from=build /tapeout-indexer /tapeout-indexer
 COPY --from=build /data /data
 # Snapshot lives here when --data /data/tapeout-indexer.json is used.
-VOLUME /data
+# (No VOLUME instruction: Railway rejects it; a Railway Volume mounted
+#  at /data provides persistence instead.)
 EXPOSE 8080
 # Non-root (65532 is the usual distroless/scratch nobody UID).
 # /data is world-writable in the image so the snapshot can be saved
