@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: tapeout-indexer
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    # Render injects $PORT automatically; the binary honours it (main.go).
+    # No env vars needed. No database: state is the JSON snapshot file.

@@ -1,0 +1,42 @@
+# Fly.io — TapeOut indexer. See DEPLOY.md.
+# Requires flyctl. Fly.io has no permanent free tier for new accounts
+# (retired Oct 2024): new accounts get a short trial (2 VM-hours or
+# 7 days, whichever first), then the smallest machine is ~$2/month
+# (Nov 2026 pricing — verify at fly.io/docs/about/pricing before
+# deploying). A card is required after the trial.
+app = "tapeout-indexer"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+
+# Persistent volume for the JSON snapshot (1 GB, $0.15/GB/month).
+# Create it before the first deploy:
+#   fly volumes create tapeout_data --size 1 --region sin
+# Without a volume the snapshot is lost on every machine restart and
+# the first sync rebuilds state from chain in ~90 s (history restarts).
+[mounts]
+  source = "tapeout_data"
+  destination = "/data"
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [[services.http_checks]]
+    path = "/healthz"
+    interval = "30s"
+    timeout = "5s"

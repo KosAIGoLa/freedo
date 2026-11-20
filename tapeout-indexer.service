@@ -1,0 +1,18 @@
+[Unit]
+Description=TapeOut-on-X-Layer indexer
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tapeout
+Group=tapeout
+WorkingDirectory=/opt/tapeout-indexer
+ExecStart=/opt/tapeout-indexer/tapeout-indexer --data /var/lib/tapeout-indexer/tapeout-indexer.json --port 8080
+Restart=on-failure
+RestartSec=5
+# No secrets: the binary only makes outbound eth_call requests.
+# Logs go to the journal: journalctl -u tapeout-indexer -f
+
+[Install]
+WantedBy=multi-user.target
