@@ -5,6 +5,24 @@ The submission needs a public URL for the dashboard (`/`) and API
 (`/api/stats`, `/api/processors`, `/api/alerts`). The binary has only
 ever run on this VM, so the first deploy is also the verification step.
 
+## LIVE — Railway (deployed 2026-11-20, Taipei)
+
+- **URL: https://freedo-production.up.railway.app** — dashboard `/`,
+  `/api/stats`, `/healthz` all verified live 2026-11-20 08:59 CST:
+  435 processors, 11,991 circuits, block 76,367,212, 0 sync errors.
+- Project `calm-charm`, service `freedo`, from `KosAIGoLa/freedo`
+  main (Dockerfile). Free plan trial: "30 days or $5.00 left" —
+  after the trial the $1/month Free credit will not cover 24/7
+  running, so the link may stop working after ~2026-12-20 unless
+  upgraded (Hobby $5/month, Pla's call).
+- Volume `freedo-volume` mounted at `/data` keeps the snapshot
+  across restarts.
+- **Railway rejects `VOLUME` in Dockerfiles** — the `VOLUME /data`
+  line was removed (commit bdd45888); the Railway Volume replaces it.
+- **Auto-deploy is unavailable** on this service: pushes to main do
+  NOT deploy automatically — in the Railway dashboard use
+  "Check for updates" → "Update" to pull a new commit.
+
 ## What is prepared (2026-11-19, Taipei)
 
 - **`Dockerfile`** (multi-stage, `golang:1.27-alpine` → `scratch`,
@@ -24,10 +42,11 @@ ever run on this VM, so the first deploy is also the verification step.
   the server was run locally with real live data
   (`/healthz`, `/api/stats`: 430 processors, 11,963 circuits).
 - **NOT verified here:** the Docker image was **not** built on this
-  VM (no Docker here) — run `docker build -t tapeout-indexer .` on a
-  machine with Docker before deploying. The Fly.io / Railway configs
-  were validated for syntax only (TOML/JSON parse) — no account was
-  created and nothing was deployed from here.
+  VM (no Docker here). The Fly.io / Render configs were validated
+  for syntax only (TOML/YAML parse) — no account was created and
+  nothing was deployed from here. **Railway is now deployed and
+  verified live** (see LIVE above) — the Dockerfile builds fine on
+  Railway once the `VOLUME` line is removed.
 
 ## What happens without a persistent volume
 
@@ -38,7 +57,13 @@ from chain in ~90 s (430+ processors, sequential batches of 10).
 History (`first_seen`, per-processor circuit history, alerts) restarts
 from scratch. Nothing breaks — the leaderboard just refills.
 
-## Option A — Render free tier ($0, no credit card) — recommended first try
+## Option A — Render free tier ($0, no credit card) — BLOCKED in practice
+
+**2026-11-20 live test: new Render accounts are asked for a credit
+card at both the Blueprint and the direct Web Service deploy — the
+"no card required" claim does not hold in practice. Render is out
+unless a card is added (Pla declined).** The notes below are kept
+for reference only.
 
 Free tier (Render docs, re-checked 2026-11-19): Hobby workspace $0,
 web service 512 MB RAM, 750 free instance-hours/month per workspace,
